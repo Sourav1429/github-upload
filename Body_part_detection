@@ -1,0 +1,54 @@
+from tensorflow import keras
+import numpy as np
+from keras.models import Sequential
+from keras.layers import Dense, Dropout, Activation, Flatten
+from keras.layers import Convolution2D, MaxPooling2D
+from keras.utils import np_utils
+import os
+import cv2
+from tqdm import tqdm
+path="D://datasets//body_part";
+X=[];y=[];
+def onehot(i):
+    if(i=='face'):
+        return [0,0,1]
+    elif(i=='hand'):
+        return [0,1,0]
+    elif(i=='leg'):
+        return [1,0,0]
+for i in tqdm(os.listdir(path)):
+    pn=os.path.join(path,i);
+    for j in os.listdir(pn):
+        img=cv2.imread(os.path.join(pn,j),cv2.IMREAD_GRAYSCALE)
+        X.append(np.reshape(cv2.resize(img,(128,128)),(128,128,1)))
+        y.append(onehot(i));
+from sklearn.model_selection import train_test_split
+X_train,X_val,y_train,y_val=train_test_split(X,y)
+X_train_arr=np.array(X_train)
+X_val_arr=np.array(X_val)
+y_train_arr=np.array(y_train)
+y_val_arr=np.array(y_val)
+print(X_train_arr.shape)
+#for i in range(len(X_val_arr)):
+#   X_val_arr[i]/=255
+model=Sequential()
+model.add(Convolution2D(32, (5, 5), activation='relu',border_mode='same',input_shape=(128,128,1)))
+model.add(Convolution2D(64, (5, 5), activation='relu',border_mode='same'))
+model.add(Convolution2D(128, (5, 5), activation='relu',border_mode='same'))
+model.add(Convolution2D(256, (5, 5), activation='relu',border_mode='same'))
+model.add(Convolution2D(256, (5, 5), activation='relu',border_mode='same'))
+model.add(MaxPooling2D(pool_size=(2,2)))
+model.add(Convolution2D(128, (5, 5), activation='relu',border_mode='same'))
+model.add(MaxPooling2D(pool_size=(2,2)))
+model.add(Convolution2D(64, (5, 5), activation='relu',border_mode='same'))
+model.add(MaxPooling2D(pool_size=(2,2)))
+model.add(Convolution2D(32, (5, 5), activation='relu',border_mode='same'))
+model.add(MaxPooling2D(pool_size=(2,2)))
+model.add(Dropout(0.2))
+model.add(Flatten())
+model.add(Dense(1024, activation='relu'))
+model.add(Dropout(0.5))model.summary()
+model.add(Dense(3, activation='softmax'))
+model.summary()
+model.summary()
+history=model.fit(x=X_train_arr,y=y_train_arr,epochs=10,validation_data=(X_val_arr,y_val_arr))
