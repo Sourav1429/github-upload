@@ -1,0 +1,27 @@
+import cv2
+import numpy as np
+path="D://datasets//body_part//model"
+from keras.models import load_model
+from keras.models import model_from_json
+import json
+
+with open('D://datasets//body_part//model//model_in_json.json','r') as f:
+    model_json = json.load(f)
+
+classifier = model_from_json(model_json)
+classifier.load_weights(path+'//model_weights.h5')
+pred_path="D://datasets//body_part//hand//img1.jpeg"
+img=cv2.imread(pred_path,cv2.IMREAD_GRAYSCALE)
+from matplotlib import pyplot as plt
+plt.imshow(img)
+img=cv2.resize(img,(128,128))
+image_pred_now=np.reshape(img,(128,128,1));
+image_pred_now=np.array([image_pred_now])
+pred=classifier.predict(image_pred_now)
+val=np.argmax(pred)
+if val==0:
+  print('Leg')
+elif val==1:
+  print('Hand')
+elif val==2:
+  print('Face')
