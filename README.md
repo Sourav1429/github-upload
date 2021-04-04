@@ -1,4 +1,4 @@
-# github-upload
+# Body_Part_Detection
 In the following segment, the uploaded codes can train and detect the body parts of a human being fairly to be said this is a trial model hence, only targeted to detect parts such
 as Hand, Face and Leg.
 
